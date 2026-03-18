@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://jcnttuhykknyfkzmmkug.supabase.co/rest/v1/\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjbnR0dWh5a2tueWZrem1ta3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTQxNTgsImV4cCI6MjA4OTM3MDE1OH0.tTd_QgJblZOXFrs6rjUT0a8IfDGTFAyNxSqJic-2TDQ\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjbnR0dWh5a2tueWZrem1ta3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTQxNTgsImV4cCI6MjA4OTM3MDE1OH0.tTd_QgJblZOXFrs6rjUT0a8IfDGTFAyNxSqJic-2TDQ\")",
+      "Bash(npm install:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(grep -E \"^\\(react|react-dom|react-router-dom|zustand|date-fns|react-hot-toast\\)$\")"
+    ]
+  }
+}
