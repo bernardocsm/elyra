@@ -35,6 +35,7 @@ interface WorkspaceStore {
   panels: Panel[]
   activePanelId: string
   openPanel: (panel: Omit<Panel, 'id'>) => void
+  splitPanel: (panel: Omit<Panel, 'id'>) => void
   closePanel: (id: string) => void
   setActivePanel: (id: string) => void
   updatePanel: (id: string, updates: Partial<Panel>) => void
@@ -49,12 +50,20 @@ interface WorkspaceStore {
   setContextMenu: (menu: ContextMenuState | null) => void
   commandPaletteOpen: boolean
   setCommandPaletteOpen: (open: boolean) => void
-  viewMode: 'grid' | 'list'
-  setViewMode: (mode: 'grid' | 'list') => void
+  viewMode: 'grid' | 'list' | 'compact'
+  setViewMode: (mode: 'grid' | 'list' | 'compact') => void
   sortBy: 'name' | 'modified' | 'created' | 'type'
   setSortBy: (sort: 'name' | 'modified' | 'created' | 'type') => void
   cardSize: 'S' | 'M' | 'L'
   setCardSize: (size: 'S' | 'M' | 'L') => void
+  showTitle: boolean
+  setShowTitle: (v: boolean) => void
+  groupFolders: boolean
+  setGroupFolders: (v: boolean) => void
+  settingsOpen: boolean
+  setSettingsOpen: (open: boolean) => void
+  activityOpen: boolean
+  setActivityOpen: (open: boolean) => void
 }
 
 let panelCounter = 2
@@ -118,6 +127,15 @@ export const useStore = create<WorkspaceStore>((set) => ({
         activePanelId: id,
       }
     }),
+  // Always push a new panel (never replaces single root panel)
+  splitPanel: (panel) =>
+    set((s) => {
+      const id = `panel-${panelCounter++}`
+      return {
+        panels: [...s.panels, { ...panel, id }],
+        activePanelId: id,
+      }
+    }),
   closePanel: (id) =>
     set((s) => {
       const panels = s.panels.filter((p) => p.id !== id)
@@ -152,4 +170,12 @@ export const useStore = create<WorkspaceStore>((set) => ({
   setSortBy: (sortBy) => set({ sortBy }),
   cardSize: 'M',
   setCardSize: (cardSize) => set({ cardSize }),
+  showTitle: true,
+  setShowTitle: (showTitle) => set({ showTitle }),
+  groupFolders: true,
+  setGroupFolders: (groupFolders) => set({ groupFolders }),
+  settingsOpen: false,
+  setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
+  activityOpen: false,
+  setActivityOpen: (activityOpen) => set({ activityOpen }),
 }))
