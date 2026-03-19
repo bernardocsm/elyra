@@ -26,7 +26,8 @@ export default function SilkSwatch({ color, active, onClick }: Props) {
         outlineOffset: 1,
       }}
     >
-      <canvas ref={canvasRef} width={60} height={40} className="w-full h-full" />
+      {/* 56×40 interno — CSS w-full h-full estica ao tamanho do grid cell */}
+      <canvas ref={canvasRef} width={56} height={40} className="w-full h-full" />
       {active && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center">

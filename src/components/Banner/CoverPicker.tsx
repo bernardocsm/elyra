@@ -39,13 +39,28 @@ export default function CoverPicker({ current, onSelect, onRemove }: Props) {
   }
 
   return (
+    /*
+     * Spec:
+     *   position: absolute; top: 48px; left: 12px;
+     *   z-index: 301;
+     *   width: 288px;
+     *   border-radius: 12px;
+     *   background: white;
+     *   border: 1px solid var(--color-divider);
+     *   box-shadow: xl;
+     *   padding: 12px;
+     */
     <div
-      className="absolute top-12 left-3 z-[301] w-72 rounded-xl bg-background-main border border-divider shadow-xl p-3 space-y-3"
+      className="absolute z-[301] bg-background-main border border-divider shadow-xl rounded-xl p-3"
+      style={{ top: 48, left: 12, width: 288 }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Silk section */}
-      <div>
-        <p className="text-[11px] font-semibold text-text-dark-secondary mb-2 uppercase tracking-wider">Silk</p>
+      {/* ── Silk ── */}
+      <section className="mb-3">
+        <p className="text-[11px] font-medium text-text-dark-secondary mb-2 tracking-wide uppercase">
+          Silk
+        </p>
+        {/* 4 cols × 2 rows = 8 swatches */}
         <div className="grid grid-cols-4 gap-1.5">
           {SILK_COLORS.map((c) => (
             <SilkSwatch
@@ -56,18 +71,21 @@ export default function CoverPicker({ current, onSelect, onRemove }: Props) {
             />
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Solid section */}
-      <div>
-        <p className="text-[11px] font-semibold text-text-dark-secondary mb-2 uppercase tracking-wider">Solid</p>
+      {/* ── Solid ── */}
+      <section className="mb-3">
+        <p className="text-[11px] font-medium text-text-dark-secondary mb-2 tracking-wide uppercase">
+          Solid
+        </p>
+        {/* 4 cols × 2 rows = 8 swatches */}
         <div className="grid grid-cols-4 gap-1.5">
           {SOLID_COLORS.map((color) => (
             <button
               key={color}
               onClick={() => onSelect('solid', color)}
               title={color}
-              className="h-10 rounded-lg transition-all hover:scale-105"
+              className="relative h-10 rounded-lg transition-transform hover:scale-105 focus:outline-none"
               style={{
                 background: color,
                 outline: current.type === 'solid' && current.value === color
@@ -75,20 +93,34 @@ export default function CoverPicker({ current, onSelect, onRemove }: Props) {
                   : '2px solid transparent',
                 outlineOffset: 1,
               }}
-            />
+            >
+              {/* Active checkmark */}
+              {current.type === 'solid' && current.value === color && (
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center">
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#09321F" strokeWidth="3.5">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
+                </span>
+              )}
+            </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Gradients section */}
-      <div>
-        <p className="text-[11px] font-semibold text-text-dark-secondary mb-2 uppercase tracking-wider">Gradients</p>
+      {/* ── Gradients ── */}
+      <section className="mb-3">
+        <p className="text-[11px] font-medium text-text-dark-secondary mb-2 tracking-wide uppercase">
+          Gradients
+        </p>
+        {/* 5 cols × 2 rows = 10 swatches */}
         <div className="grid grid-cols-5 gap-1.5">
           {GRADIENT_COLORS.map((grad) => (
             <button
               key={grad}
               onClick={() => onSelect('gradient', grad)}
-              className="h-10 rounded-lg transition-all hover:scale-105"
+              className="relative h-10 rounded-lg transition-transform hover:scale-105 focus:outline-none"
               style={{
                 background: grad,
                 outline: current.type === 'gradient' && current.value === grad
@@ -96,12 +128,22 @@ export default function CoverPicker({ current, onSelect, onRemove }: Props) {
                   : '2px solid transparent',
                 outlineOffset: 1,
               }}
-            />
+            >
+              {current.type === 'gradient' && current.value === grad && (
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center">
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#09321F" strokeWidth="3.5">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
+                </span>
+              )}
+            </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Actions */}
+      {/* ── Actions ── */}
       <div className="border-t border-divider pt-2 space-y-0.5">
         <input
           ref={fileRef}
@@ -110,23 +152,28 @@ export default function CoverPicker({ current, onSelect, onRemove }: Props) {
           className="hidden"
           onChange={handleImageUpload}
         />
+
+        {/* Upload image */}
         <button
           onClick={() => fileRef.current?.click()}
           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-dark-secondary hover:bg-neutral-dark-5 rounded-lg transition-colors text-left"
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="16 16 12 12 8 16"/>
-            <line x1="12" y1="12" x2="12" y2="21"/>
-            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="16 16 12 12 8 16" />
+            <line x1="12" y1="12" x2="12" y2="21" />
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
           </svg>
           Upload image
         </button>
+
+        {/* Remove cover — text-accent-raspberry per spec */}
         <button
           onClick={onRemove}
           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-accent-raspberry hover:bg-neutral-dark-5 rounded-lg transition-colors text-left"
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
           Remove cover
         </button>

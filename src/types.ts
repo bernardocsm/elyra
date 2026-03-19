@@ -1,4 +1,4 @@
-export type ItemType = 'folder' | 'note' | 'canvas'
+export type ItemType = 'folder' | 'note' | 'canvas' | 'chat' | 'link'
 export type CoverType = 'silk' | 'solid' | 'gradient' | 'image'
 
 export interface Workspace {
@@ -20,6 +20,8 @@ export interface Item {
   content: string | null
   color: string
   is_pinned: boolean
+  is_deleted: boolean
+  deleted_at: string | null
   position: number
   created_at: string
   updated_at: string
@@ -34,7 +36,7 @@ export interface Recent {
 
 export interface Panel {
   id: string
-  type: 'root' | 'folder' | 'note' | 'canvas' | 'trash'
+  type: 'root' | 'folder' | 'note' | 'canvas' | 'trash' | 'chat' | 'link'
   itemId?: string
 }
 
