@@ -4,8 +4,8 @@ import { format } from 'date-fns'
 
 const TYPE_LABEL: Record<string, string> = {
   folder: 'Folder',
-  note: 'Markdown',
-  canvas: 'EdenCanvas',
+  note: 'Note',
+  canvas: 'Canvas',
   chat: 'AI Chat',
   link: 'Link',
 }

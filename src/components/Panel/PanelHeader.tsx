@@ -39,9 +39,12 @@ interface Props {
   panel: Panel
   canClose: boolean
   onClose: () => void
+  onNavigate?: (dir: 'back' | 'forward') => void
+  canGoBack?: boolean
+  canGoForward?: boolean
 }
 
-export default function PanelHeader({ panel, canClose, onClose }: Props) {
+export default function PanelHeader({ panel, canClose, onClose, onNavigate, canGoBack, canGoForward }: Props) {
   const {
     items, workspace,
     viewMode, setViewMode,

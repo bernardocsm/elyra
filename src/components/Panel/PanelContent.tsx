@@ -335,7 +335,9 @@ function TrashView({ panel, canClose, onClose }: { panel: Panel; canClose: boole
   )
 }
 
-const TYPE_ICON: Record<string, string> = { folder: '📁', note: '📄', canvas: '⬜', chat: '✨', link: '🔗' }
+const TYPE_ICON:  Record<string, string> = { folder: '📁', note: '📄', canvas: '⬜', chat: '✨', link: '🔗' }
+const TYPE_LABEL: Record<string, string> = { folder: 'Folder', note: 'Note', canvas: 'Canvas', chat: 'Chat', link: 'Link' }
+function typeLabel(type: string) { return TYPE_LABEL[type] ?? type }
 
 function TrashItem({ item, onRestore, onDelete }: {
   item: Item
@@ -351,8 +353,8 @@ function TrashItem({ item, onRestore, onDelete }: {
     >
       <span className="text-sm w-5 text-center shrink-0">{TYPE_ICON[item.type] ?? '📄'}</span>
       <span className="flex-1 text-sm text-text-dark-primary truncate">{item.name}</span>
-      <span className="text-xs text-text-dark-secondary shrink-0 capitalize opacity-0 group-hover:opacity-100">
-        {item.type}
+      <span className="text-xs text-text-dark-secondary shrink-0 opacity-0 group-hover:opacity-100">
+        {typeLabel(item.type)}
       </span>
       <div className="relative shrink-0">
         <button
@@ -454,8 +456,8 @@ function ListView({
         >
           <span className="text-sm w-5 text-center shrink-0">{TYPE_ICON[item.type] ?? '📄'}</span>
           <span className="flex-1 text-sm text-text-dark-primary truncate">{item.name}</span>
-          <span className="text-xs text-text-dark-secondary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity capitalize">
-            {item.type === 'note' ? 'Markdown' : item.type === 'canvas' ? 'EdenCanvas' : item.type}
+          <span className="text-xs text-text-dark-secondary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            {typeLabel(item.type)}
           </span>
           <span className="text-xs shrink-0 tabular-nums" style={{ color: '#D97706' }}>
             {new Date(item.updated_at).toLocaleDateString()}

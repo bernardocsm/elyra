@@ -64,6 +64,24 @@ interface WorkspaceStore {
   setSettingsOpen: (open: boolean) => void
   activityOpen: boolean
   setActivityOpen: (open: boolean) => void
+
+  // Info panel
+  infoPanelItemId: string | null
+  setInfoPanelItemId: (id: string | null) => void
+
+  // Move-to modal
+  moveToModal: { open: boolean; itemIds: string[] }
+  openMoveToModal: (ids: string | string[]) => void
+  closeMoveToModal: () => void
+
+  // New folder modal
+  newFolderModal: { open: boolean; parentId: string | null }
+  openNewFolderModal: (parentId?: string | null) => void
+  closeNewFolderModal: () => void
+
+  // Soft delete / restore (trash)
+  softDeleteItem: (id: string) => void
+  restoreItem: (id: string) => void
 }
 
 let panelCounter = 2
@@ -178,4 +196,30 @@ export const useStore = create<WorkspaceStore>((set) => ({
   setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
   activityOpen: false,
   setActivityOpen: (activityOpen) => set({ activityOpen }),
+
+  // Info panel
+  infoPanelItemId: null,
+  setInfoPanelItemId: (infoPanelItemId) => set({ infoPanelItemId }),
+
+  // Move-to modal
+  moveToModal: { open: false, itemIds: [] },
+  openMoveToModal: (ids) => set({ moveToModal: { open: true, itemIds: Array.isArray(ids) ? ids : [ids] } }),
+  closeMoveToModal: () => set({ moveToModal: { open: false, itemIds: [] } }),
+
+  // New folder modal
+  newFolderModal: { open: false, parentId: null },
+  openNewFolderModal: (parentId = null) => set({ newFolderModal: { open: true, parentId } }),
+  closeNewFolderModal: () => set({ newFolderModal: { open: false, parentId: null } }),
+
+  // Soft delete (mark is_deleted = true locally)
+  softDeleteItem: (id) =>
+    set((s) => ({
+      items: s.items.map((i) => (i.id === id ? { ...i, is_deleted: true } : i)),
+    })),
+
+  // Restore from trash
+  restoreItem: (id) =>
+    set((s) => ({
+      items: s.items.map((i) => (i.id === id ? { ...i, is_deleted: false } : i)),
+    })),
 }))
