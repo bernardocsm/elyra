@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useStore } from '../../store/workspace'
 import { supabase } from '../../lib/supabase'
 import SidebarItem from './SidebarItem'
@@ -20,6 +21,16 @@ export default function Sidebar() {
   } = useStore()
 
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [menuPos, setMenuPos] = useState({ bottom: 0, left: 0, width: 0 })
+  const userBtnRef = useRef<HTMLButtonElement>(null)
+
+  const openUserMenu = useCallback(() => {
+    if (userBtnRef.current) {
+      const rect = userBtnRef.current.getBoundingClientRect()
+      setMenuPos({ bottom: window.innerHeight - rect.top + 6, left: rect.left, width: rect.width })
+    }
+    setUserMenuOpen((o) => !o)
+  }, [])
 
   async function createNewChat() {
     if (!workspace) return
@@ -291,7 +302,8 @@ export default function Sidebar() {
         {/* User button */}
         <div className="relative">
           <button
-            onClick={() => setUserMenuOpen((o) => !o)}
+            ref={userBtnRef}
+            onClick={openUserMenu}
             className="flex items-center gap-2.5 px-1.5 py-1.5 rounded-lg w-full hover:bg-neutral-dark-5 transition-colors"
           >
             <div className="w-7 h-7 rounded-full bg-accent-eden flex items-center justify-center text-white text-xs font-semibold shrink-0">
@@ -305,15 +317,15 @@ export default function Sidebar() {
             </div>
           </button>
 
-          {userMenuOpen && (
+          {userMenuOpen && createPortal(
             <>
-              {/* Backdrop — z-[600] so it's above action icon row (z-20 sidebar) but below popup */}
-              <div className="fixed inset-0 z-[600]" onClick={() => setUserMenuOpen(false)} />
+              {/* Backdrop — z-[700] at document.body level, covers everything */}
+              <div className="fixed inset-0 z-[700]" onClick={() => setUserMenuOpen(false)} />
 
-              {/* Popup — positioned ABOVE user button via bottom-full, z-[601] above backdrop */}
+              {/* Popup — portal-rendered at body level, positioned above user button */}
               <div
-                className="absolute left-0 z-[601] w-56 bg-background-main border border-divider rounded-xl shadow-xl overflow-hidden"
-                style={{ bottom: 'calc(100% + 6px)' }}
+                className="fixed z-[701] w-56 bg-background-main border border-divider rounded-xl shadow-xl overflow-hidden"
+                style={{ bottom: menuPos.bottom, left: menuPos.left }}
               >
                 {/* Header: avatar + name + email */}
                 <div className="flex items-center gap-2.5 px-3 py-3 border-b border-divider">
@@ -373,7 +385,8 @@ export default function Sidebar() {
                   </button>
                 </div>
               </div>
-            </>
+            </>,
+            document.body
           )}
         </div>
       </div>

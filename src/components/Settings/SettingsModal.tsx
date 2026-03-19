@@ -48,12 +48,12 @@ export default function SettingsModal() {
       {/* Modal */}
       <div
         className="relative flex bg-background-main rounded-2xl shadow-2xl overflow-hidden"
-        style={{ width: 800, height: 580, maxWidth: '95vw', maxHeight: '92vh' }}
+        style={{ width: 800, height: 580, maxWidth: '95vw', maxHeight: '92vh', minHeight: 400 }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── Left nav ───────────────────────────────────────────────────── */}
         <nav
-          className="shrink-0 flex flex-col py-6 px-3 border-r border-divider bg-background-page overflow-y-auto"
+          className="shrink-0 flex flex-col py-6 px-3 border-r border-divider bg-background-page overflow-y-auto min-h-0"
           style={{ width: 200 }}
         >
           <p className="px-3 mb-4 text-xs font-semibold text-text-dark-secondary uppercase tracking-wider">

@@ -6,6 +6,7 @@ const TYPE_LABEL: Record<string, string> = {
   folder: 'Folder',
   note: 'Note',
   canvas: 'Canvas',
+  edenCanvas: 'Canvas',
   chat: 'AI Chat',
   link: 'Link',
 }
