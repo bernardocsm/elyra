@@ -5,9 +5,8 @@ import Sidebar from '../components/Sidebar'
 import PanelContent from '../components/Panel'
 import ContextMenu from '../components/ContextMenu'
 import CommandPalette from '../components/CommandPalette'
-import NewFolderModal from '../components/NewFolderModal'
-import MoveToModal from '../components/MoveToModal'
-import SelectionBar from '../components/SelectionBar'
+import SettingsModal from '../components/Settings/SettingsModal'
+import ActivityPanel from '../components/Activity/ActivityPanel'
 
 export default function Workspace() {
   const {
@@ -167,9 +166,8 @@ export default function Workspace() {
       {/* ── Global overlays ── */}
       <ContextMenu />
       <CommandPalette />
-      <NewFolderModal />
-      <MoveToModal />
-      <SelectionBar />
+      <SettingsModal />
+      <ActivityPanel />
     </div>
   )
 }

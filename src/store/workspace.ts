@@ -2,16 +2,6 @@ import { create } from 'zustand'
 import type { User } from '@supabase/supabase-js'
 import type { Workspace, Item, Panel, ContextMenuState } from '../types'
 
-interface NewFolderModalState {
-  open: boolean
-  parentId: string | null
-}
-
-interface MoveToModalState {
-  open: boolean
-  itemIds: string[]
-}
-
 interface WorkspaceStore {
   // Auth
   user: User | null
@@ -27,8 +17,6 @@ interface WorkspaceStore {
   addItem: (item: Item) => void
   updateItem: (id: string, updates: Partial<Item>) => void
   removeItem: (id: string) => void
-  softDeleteItem: (id: string) => void
-  restoreItem: (id: string) => void
 
   // Recents (item ids, newest first, max 10)
   recentIds: string[]
@@ -47,6 +35,7 @@ interface WorkspaceStore {
   panels: Panel[]
   activePanelId: string
   openPanel: (panel: Omit<Panel, 'id'>) => void
+  splitPanel: (panel: Omit<Panel, 'id'>) => void
   closePanel: (id: string) => void
   setActivePanel: (id: string) => void
   updatePanel: (id: string, updates: Partial<Panel>) => void
@@ -55,34 +44,26 @@ interface WorkspaceStore {
   selectedItems: string[]
   toggleSelectItem: (id: string) => void
   clearSelection: () => void
-  setSelectedItems: (ids: string[]) => void
 
   // UI
   contextMenu: ContextMenuState | null
   setContextMenu: (menu: ContextMenuState | null) => void
   commandPaletteOpen: boolean
   setCommandPaletteOpen: (open: boolean) => void
-  viewMode: 'grid' | 'list'
-  setViewMode: (mode: 'grid' | 'list') => void
+  viewMode: 'grid' | 'list' | 'compact'
+  setViewMode: (mode: 'grid' | 'list' | 'compact') => void
   sortBy: 'name' | 'modified' | 'created' | 'type'
   setSortBy: (sort: 'name' | 'modified' | 'created' | 'type') => void
-  groupFolders: boolean
-  setGroupFolders: (v: boolean) => void
   cardSize: 'S' | 'M' | 'L'
   setCardSize: (size: 'S' | 'M' | 'L') => void
-
-  // Modals
-  newFolderModal: NewFolderModalState
-  openNewFolderModal: (parentId?: string | null) => void
-  closeNewFolderModal: () => void
-
-  moveToModal: MoveToModalState
-  openMoveToModal: (itemIds: string[]) => void
-  closeMoveToModal: () => void
-
-  // Info panel
-  infoPanelItemId: string | null
-  setInfoPanelItemId: (id: string | null) => void
+  showTitle: boolean
+  setShowTitle: (v: boolean) => void
+  groupFolders: boolean
+  setGroupFolders: (v: boolean) => void
+  settingsOpen: boolean
+  setSettingsOpen: (open: boolean) => void
+  activityOpen: boolean
+  setActivityOpen: (open: boolean) => void
 }
 
 let panelCounter = 2
@@ -105,20 +86,6 @@ export const useStore = create<WorkspaceStore>((set) => ({
   removeItem: (id) =>
     set((s) => ({
       items: s.items.filter((i) => i.id !== id && i.parent_id !== id),
-    })),
-  softDeleteItem: (id) =>
-    set((s) => ({
-      items: s.items.map((i) =>
-        i.id === id || i.parent_id === id
-          ? { ...i, is_deleted: true, deleted_at: new Date().toISOString() }
-          : i
-      ),
-    })),
-  restoreItem: (id) =>
-    set((s) => ({
-      items: s.items.map((i) =>
-        i.id === id ? { ...i, is_deleted: false, deleted_at: null } : i
-      ),
     })),
 
   // Recents
@@ -160,6 +127,15 @@ export const useStore = create<WorkspaceStore>((set) => ({
         activePanelId: id,
       }
     }),
+  // Always push a new panel (never replaces single root panel)
+  splitPanel: (panel) =>
+    set((s) => {
+      const id = `panel-${panelCounter++}`
+      return {
+        panels: [...s.panels, { ...panel, id }],
+        activePanelId: id,
+      }
+    }),
   closePanel: (id) =>
     set((s) => {
       const panels = s.panels.filter((p) => p.id !== id)
@@ -182,7 +158,6 @@ export const useStore = create<WorkspaceStore>((set) => ({
         : [...s.selectedItems, id],
     })),
   clearSelection: () => set({ selectedItems: [] }),
-  setSelectedItems: (ids) => set({ selectedItems: ids }),
 
   // UI
   contextMenu: null,
@@ -193,23 +168,14 @@ export const useStore = create<WorkspaceStore>((set) => ({
   setViewMode: (viewMode) => set({ viewMode }),
   sortBy: 'created',
   setSortBy: (sortBy) => set({ sortBy }),
-  groupFolders: true,
-  setGroupFolders: (groupFolders) => set({ groupFolders }),
   cardSize: 'M',
   setCardSize: (cardSize) => set({ cardSize }),
-
-  // Modals
-  newFolderModal: { open: false, parentId: null },
-  openNewFolderModal: (parentId = null) =>
-    set({ newFolderModal: { open: true, parentId: parentId ?? null } }),
-  closeNewFolderModal: () =>
-    set({ newFolderModal: { open: false, parentId: null } }),
-
-  moveToModal: { open: false, itemIds: [] },
-  openMoveToModal: (itemIds) => set({ moveToModal: { open: true, itemIds } }),
-  closeMoveToModal: () => set({ moveToModal: { open: false, itemIds: [] } }),
-
-  // Info panel
-  infoPanelItemId: null,
-  setInfoPanelItemId: (infoPanelItemId) => set({ infoPanelItemId }),
+  showTitle: true,
+  setShowTitle: (showTitle) => set({ showTitle }),
+  groupFolders: true,
+  setGroupFolders: (groupFolders) => set({ groupFolders }),
+  settingsOpen: false,
+  setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
+  activityOpen: false,
+  setActivityOpen: (activityOpen) => set({ activityOpen }),
 }))
