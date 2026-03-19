@@ -80,6 +80,29 @@ export default function NewItemDropdown() {
     }
   }
 
+  async function importLink(url: string) {
+    if (!workspace || !url) return
+    setOpen(false)
+    setPLMode(false)
+    setPasteUrl('')
+    // Derive a readable name from the URL
+    let name = url
+    try {
+      const parsed = new URL(url)
+      name = parsed.hostname.replace(/^www\./, '') + (parsed.pathname !== '/' ? parsed.pathname : '')
+      if (name.length > 60) name = name.slice(0, 60) + '…'
+    } catch { /* not a valid URL, use raw string */ }
+    const count = items.filter((i) => i.parent_id === null).length
+    const { data } = await supabase
+      .from('items')
+      .insert({ workspace_id: workspace.id, type: 'link', name, content: url, parent_id: null, position: count })
+      .select().single()
+    if (data) {
+      addItem(data as any)
+      openPanel({ type: 'link', itemId: data.id })
+    }
+  }
+
   function handleNewChat() {
     setOpen(false)
     setSidebarMode('ai')  // switch to AI sidebar mode (chat entry point)
@@ -144,12 +167,9 @@ export default function NewItemDropdown() {
                 onChange={(e) => setPasteUrl(e.target.value)}
                 placeholder="https://..."
                 className="w-full px-3 py-1.5 text-sm rounded-md border border-divider bg-background-faint outline-none focus:border-accent-eden transition-colors"
-                onKeyDown={(e) => {
+                onKeyDown={async (e) => {
                   if (e.key === 'Enter' && pasteUrl.trim()) {
-                    // TODO: trigger URL import handler
-                    setOpen(false)
-                    setPLMode(false)
-                    setPasteUrl('')
+                    await importLink(pasteUrl.trim())
                   }
                   if (e.key === 'Escape') {
                     setPLMode(false)
@@ -165,7 +185,7 @@ export default function NewItemDropdown() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => { setOpen(false); setPLMode(false); setPasteUrl('') }}
+                  onClick={() => importLink(pasteUrl.trim())}
                   className="flex-1 text-xs py-1 rounded-md bg-accent-eden text-white hover:bg-accent-primary transition-colors"
                   disabled={!pasteUrl.trim()}
                 >

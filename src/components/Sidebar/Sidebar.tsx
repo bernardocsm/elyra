@@ -15,11 +15,24 @@ export default function Sidebar() {
     sidebarOpen, setSidebarOpen,
     sidebarMode, setSidebarMode,
     workspace, user, items, recentIds,
-    openPanel, addRecent, setCommandPaletteOpen,
+    openPanel, addItem, addRecent, setCommandPaletteOpen,
     setContextMenu, setSettingsOpen, setActivityOpen,
   } = useStore()
 
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+
+  async function createNewChat() {
+    if (!workspace) return
+    const count = items.filter((i) => i.parent_id === null).length
+    const { data } = await supabase
+      .from('items')
+      .insert({ workspace_id: workspace.id, type: 'chat', name: 'New Chat', parent_id: null, position: count })
+      .select().single()
+    if (data) {
+      addItem(data as any)
+      openPanel({ type: 'chat', itemId: data.id })
+    }
+  }
 
   function handleOpen(item: Item) {
     openPanel({ type: item.type as any, itemId: item.id })
@@ -64,8 +77,8 @@ export default function Sidebar() {
       Icon:    SparkleIcon,
       mode:    'ai' as const,
       tooltip: 'Eden AI \u00b7 \u00d72 New Chat',
-      // x2: clicking when already on AI → open a new chat
-      onX2:    () => { /* TODO: openPanel({ type: 'chat' }) */ },
+      // x2: clicking when already on AI → create and open a new chat
+      onX2:    () => { createNewChat() },
     },
     {
       id:      'library',
@@ -73,7 +86,7 @@ export default function Sidebar() {
       Icon:    LibraryIcon,
       mode:    'library' as const,
       tooltip: 'Library \u00b7 \u00d72 Go to Library',
-      onX2:    () => { /* TODO: openPanel({ type: 'library' }) */ },
+      onX2:    () => openPanel({ type: 'root' }),
     },
   ]
 
@@ -233,7 +246,10 @@ export default function Sidebar() {
             </div>
             <div>
               <p className="font-semibold text-text-dark-primary text-xs uppercase tracking-wider mb-2">Chats</p>
-              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-neutral-dark-5 text-sm transition-colors">
+              <button
+                onClick={createNewChat}
+                className="w-full text-left px-3 py-2 rounded-lg hover:bg-neutral-dark-5 text-sm transition-colors"
+              >
                 New Chat
               </button>
             </div>
