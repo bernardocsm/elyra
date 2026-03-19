@@ -8,7 +8,8 @@
 //     Group 1: New Note | New Canvas | New Chat | Paste Link
 //     Group 2: New Folder | Upload Files | Upload Folder
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useStore } from '../../store/workspace'
 import { supabase } from '../../lib/supabase'
 
@@ -16,16 +17,33 @@ export default function NewItemDropdown() {
   const [open, setOpen]               = useState(false)
   const [pasteLinkMode, setPLMode]    = useState(false)
   const [pasteUrl, setPasteUrl]       = useState('')
+  const [dropPos, setDropPos]         = useState({ top: 0, left: 0 })
+  const btnRef     = useRef<HTMLButtonElement>(null)
   const dropRef    = useRef<HTMLDivElement>(null)
   const fileRef    = useRef<HTMLInputElement>(null)
   const folderRef  = useRef<HTMLInputElement>(null)
+
+  // Calculate dropdown position from button rect
+  const openDropdown = useCallback(() => {
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setDropPos({ top: rect.bottom + 6, left: rect.left })
+    }
+    setOpen((o) => !o)
+    setPLMode(false)
+    setPasteUrl('')
+  }, [])
 
   const { workspace, addItem, openPanel, items, setSidebarMode } = useStore()
 
   // Close on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (dropRef.current && !dropRef.current.contains(e.target as Node)) {
+      const target = e.target as Node
+      if (
+        dropRef.current && !dropRef.current.contains(target) &&
+        btnRef.current && !btnRef.current.contains(target)
+      ) {
         setOpen(false)
         setPLMode(false)
         setPasteUrl('')
@@ -78,11 +96,12 @@ export default function NewItemDropdown() {
   }
 
   return (
-    <div className="relative" ref={dropRef}>
+    <div className="relative">
 
       {/* ── "+ New" trigger button ───────────────────────────────────────── */}
       <button
-        onClick={() => { setOpen((o) => !o); setPLMode(false); setPasteUrl('') }}
+        ref={btnRef}
+        onClick={openDropdown}
         className="flex items-center gap-1 text-xs font-medium rounded-full border transition-colors"
         style={{
           height:      26,
@@ -101,14 +120,16 @@ export default function NewItemDropdown() {
         New
       </button>
 
-      {/* ── Dropdown ────────────────────────────────────────────────────── */}
-      {open && (
+      {/* ── Dropdown — rendered via portal so it escapes sidebar overflow:hidden ── */}
+      {open && createPortal(
         <div
-          className="absolute left-0 z-50 bg-background-main border border-divider shadow-xl overflow-hidden"
+          ref={dropRef}
+          className="fixed z-[300] bg-background-main border border-divider shadow-xl overflow-hidden"
           style={{
-            top:          32,        // just below button (8px below h-26)
-            width:        240,       // spec: 240px
-            borderRadius: 8,         // spec: rounded-lg
+            top:          dropPos.top,
+            left:         dropPos.left,
+            width:        240,
+            borderRadius: 8,
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -201,7 +222,8 @@ export default function NewItemDropdown() {
               />
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ── Hidden file inputs ─────────────────────────────────────────── */}

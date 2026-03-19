@@ -53,7 +53,7 @@ export default function SettingsModal() {
       >
         {/* ── Left nav ───────────────────────────────────────────────────── */}
         <nav
-          className="shrink-0 flex flex-col py-6 px-3 border-r border-divider bg-background-page"
+          className="shrink-0 flex flex-col py-6 px-3 border-r border-divider bg-background-page overflow-y-auto"
           style={{ width: 200 }}
         >
           <p className="px-3 mb-4 text-xs font-semibold text-text-dark-secondary uppercase tracking-wider">
