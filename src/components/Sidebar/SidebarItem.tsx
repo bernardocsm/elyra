@@ -25,7 +25,7 @@ export default function SidebarItem({ item, depth = 0, onOpen }: Props) {
   const isFolder = item.type === 'folder'
   const isExpanded = expandedFolders.includes(item.id)
   const children = items
-    .filter((i) => i.parent_id === item.id)
+    .filter((i) => i.parent_id === item.id && !i.is_deleted)
     .sort((a, b) => a.position - b.position)
 
   async function handleAddChild(e: React.MouseEvent) {

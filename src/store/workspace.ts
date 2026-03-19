@@ -2,6 +2,16 @@ import { create } from 'zustand'
 import type { User } from '@supabase/supabase-js'
 import type { Workspace, Item, Panel, ContextMenuState } from '../types'
 
+interface NewFolderModalState {
+  open: boolean
+  parentId: string | null
+}
+
+interface MoveToModalState {
+  open: boolean
+  itemIds: string[]
+}
+
 interface WorkspaceStore {
   // Auth
   user: User | null
@@ -17,6 +27,8 @@ interface WorkspaceStore {
   addItem: (item: Item) => void
   updateItem: (id: string, updates: Partial<Item>) => void
   removeItem: (id: string) => void
+  softDeleteItem: (id: string) => void
+  restoreItem: (id: string) => void
 
   // Recents (item ids, newest first, max 10)
   recentIds: string[]
@@ -43,6 +55,7 @@ interface WorkspaceStore {
   selectedItems: string[]
   toggleSelectItem: (id: string) => void
   clearSelection: () => void
+  setSelectedItems: (ids: string[]) => void
 
   // UI
   contextMenu: ContextMenuState | null
@@ -53,8 +66,23 @@ interface WorkspaceStore {
   setViewMode: (mode: 'grid' | 'list') => void
   sortBy: 'name' | 'modified' | 'created' | 'type'
   setSortBy: (sort: 'name' | 'modified' | 'created' | 'type') => void
+  groupFolders: boolean
+  setGroupFolders: (v: boolean) => void
   cardSize: 'S' | 'M' | 'L'
   setCardSize: (size: 'S' | 'M' | 'L') => void
+
+  // Modals
+  newFolderModal: NewFolderModalState
+  openNewFolderModal: (parentId?: string | null) => void
+  closeNewFolderModal: () => void
+
+  moveToModal: MoveToModalState
+  openMoveToModal: (itemIds: string[]) => void
+  closeMoveToModal: () => void
+
+  // Info panel
+  infoPanelItemId: string | null
+  setInfoPanelItemId: (id: string | null) => void
 }
 
 let panelCounter = 2
@@ -77,6 +105,20 @@ export const useStore = create<WorkspaceStore>((set) => ({
   removeItem: (id) =>
     set((s) => ({
       items: s.items.filter((i) => i.id !== id && i.parent_id !== id),
+    })),
+  softDeleteItem: (id) =>
+    set((s) => ({
+      items: s.items.map((i) =>
+        i.id === id || i.parent_id === id
+          ? { ...i, is_deleted: true, deleted_at: new Date().toISOString() }
+          : i
+      ),
+    })),
+  restoreItem: (id) =>
+    set((s) => ({
+      items: s.items.map((i) =>
+        i.id === id ? { ...i, is_deleted: false, deleted_at: null } : i
+      ),
     })),
 
   // Recents
@@ -140,6 +182,7 @@ export const useStore = create<WorkspaceStore>((set) => ({
         : [...s.selectedItems, id],
     })),
   clearSelection: () => set({ selectedItems: [] }),
+  setSelectedItems: (ids) => set({ selectedItems: ids }),
 
   // UI
   contextMenu: null,
@@ -150,6 +193,23 @@ export const useStore = create<WorkspaceStore>((set) => ({
   setViewMode: (viewMode) => set({ viewMode }),
   sortBy: 'created',
   setSortBy: (sortBy) => set({ sortBy }),
+  groupFolders: true,
+  setGroupFolders: (groupFolders) => set({ groupFolders }),
   cardSize: 'M',
   setCardSize: (cardSize) => set({ cardSize }),
+
+  // Modals
+  newFolderModal: { open: false, parentId: null },
+  openNewFolderModal: (parentId = null) =>
+    set({ newFolderModal: { open: true, parentId: parentId ?? null } }),
+  closeNewFolderModal: () =>
+    set({ newFolderModal: { open: false, parentId: null } }),
+
+  moveToModal: { open: false, itemIds: [] },
+  openMoveToModal: (itemIds) => set({ moveToModal: { open: true, itemIds } }),
+  closeMoveToModal: () => set({ moveToModal: { open: false, itemIds: [] } }),
+
+  // Info panel
+  infoPanelItemId: null,
+  setInfoPanelItemId: (infoPanelItemId) => set({ infoPanelItemId }),
 }))

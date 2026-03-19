@@ -26,7 +26,7 @@ async function ensureWorkspace(userId: string) {
 
   store.setWorkspace(ws as Workspace)
 
-  // Load all items for workspace
+  // Load all items for workspace (include deleted so trash view works)
   const { data: items } = await supabase
     .from('items')
     .select('*')

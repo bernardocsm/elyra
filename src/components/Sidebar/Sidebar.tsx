@@ -32,18 +32,18 @@ export default function Sidebar() {
   }
 
   const recentItems = recentIds
-    .map((id) => items.find((i) => i.id === id))
+    .map((id) => items.find((i) => i.id === id && !i.is_deleted))
     .filter((i): i is Item => Boolean(i))
     .slice(0, 3)
 
-  const pinnedItems = items.filter((i) => i.is_pinned)
+  const pinnedItems = items.filter((i) => i.is_pinned && !i.is_deleted)
 
   const rootFolders = items
-    .filter((i) => i.parent_id === null && i.type === 'folder')
+    .filter((i) => i.parent_id === null && i.type === 'folder' && !i.is_deleted)
     .sort((a, b) => a.position - b.position)
 
   const rootNotes = items
-    .filter((i) => i.parent_id === null && i.type !== 'folder')
+    .filter((i) => i.parent_id === null && i.type !== 'folder' && !i.is_deleted)
     .sort((a, b) => a.position - b.position)
 
   const navItems = [
