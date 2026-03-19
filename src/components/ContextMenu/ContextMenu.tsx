@@ -125,6 +125,12 @@ const icons = {
       <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
     </svg>
   ),
+  removeFolder: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+      <line x1="9" y1="12" x2="15" y2="18"/><line x1="15" y1="12" x2="9" y2="18"/>
+    </svg>
+  ),
 }
 
 // ── Color palette ─────────────────────────────────────────────────────────────
@@ -142,6 +148,7 @@ export default function ContextMenu() {
     items, updateItem, removeItem, addItem,
     workspace, openPanel, splitPanel,
     setSidebarMode, setCommandPaletteOpen,
+    openMoveToModal,
   } = useStore()
 
   const ref = useRef<HTMLDivElement>(null)
@@ -241,8 +248,17 @@ export default function ContextMenu() {
   }
 
   function handleMoveTo() {
+    if (!item) return
     close()
-    toast('Move to coming soon', { icon: '📁' })
+    openMoveToModal(item.id)
+  }
+
+  async function handleRemoveFromFolder() {
+    if (!item) return
+    close()
+    updateItem(item.id, { parent_id: null })
+    await supabase.from('items').update({ parent_id: null }).eq('id', item.id)
+    toast.success(`"${item.name}" moved to home`)
   }
 
   function handleDownload() {
@@ -391,6 +407,9 @@ export default function ContextMenu() {
         {/* Group 3: Share & info */}
         <MenuRow icon={icons.share}    label="Share"       onClick={handleShare} />
         <MenuRow icon={icons.move}     label="Move to"     onClick={handleMoveTo} />
+        {item?.parent_id !== null && item?.parent_id !== undefined && (
+          <MenuRow icon={icons.removeFolder} label="Remove from folder" onClick={handleRemoveFromFolder} />
+        )}
         <MenuRow icon={icons.download} label="Download"    onClick={handleDownload} />
         <MenuRow icon={icons.info}     label="Information" onClick={handleInformation} />
         <Sep />

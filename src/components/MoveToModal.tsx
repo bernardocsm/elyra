@@ -27,9 +27,13 @@ function FolderRow({ item, depth, selected, onSelect, excludeIds }: FolderRowPro
 
   return (
     <div>
-      <button
+      {/* Row — div instead of button so we can nest the chevron button inside */}
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => onSelect(id)}
-        className="flex items-center w-full rounded-lg px-2 py-1.5 text-sm text-left transition-colors"
+        onKeyDown={(e) => e.key === 'Enter' && onSelect(id)}
+        className="flex items-center w-full rounded-lg px-2 py-1.5 text-sm text-left transition-colors cursor-pointer select-none"
         style={{
           paddingLeft: 8 + depth * 16,
           background: isSelected ? 'rgb(236,240,237)' : 'transparent',
@@ -37,21 +41,23 @@ function FolderRow({ item, depth, selected, onSelect, excludeIds }: FolderRowPro
           opacity: isExcluded ? 0.4 : 1,
         }}
       >
-        {children.length > 0 && (
+        {/* Chevron toggle — separate button, stops propagation */}
+        {children.length > 0 ? (
           <button
             onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v) }}
-            className="shrink-0 mr-1 text-text-dark-secondary/50"
+            className="shrink-0 mr-1 text-text-dark-secondary/50 hover:text-text-dark-primary"
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-              style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 150ms' }}>
+              style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 150ms' }}>
               <polyline points="9 18 15 12 9 6"/>
             </svg>
           </button>
+        ) : (
+          <span style={{ width: 14, display: 'inline-block', flexShrink: 0 }} />
         )}
-        {children.length === 0 && <span style={{ width: 14, display: 'inline-block' }} />}
 
         {item ? (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill={item.color} className="mr-1.5 shrink-0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill={item.color || '#686764'} className="mr-1.5 shrink-0">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
           </svg>
         ) : (
@@ -61,7 +67,7 @@ function FolderRow({ item, depth, selected, onSelect, excludeIds }: FolderRowPro
           </svg>
         )}
         <span className="truncate">{item?.name ?? 'Home'}</span>
-      </button>
+      </div>
 
       {expanded && children.map((child) => (
         <FolderRow

@@ -6,7 +6,8 @@ export const supabase = createClient(
   {
     auth: {
       // Bypass Web Locks API to avoid lock conflicts in dev (multiple tabs, HMR, etc.)
-      lock: async (_name: string, _acquireTimeout: number, fn: () => Promise<unknown>) => fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      lock: (async (_name: string, _acquireTimeout: number, fn: () => Promise<unknown>) => fn()) as any,
     },
   }
 )
