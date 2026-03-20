@@ -1,12 +1,15 @@
 import { useEffect } from 'react'
 import { useStore } from '../store/workspace'
 import { supabase } from '../lib/supabase'
-import Sidebar from '../components/Sidebar'
-import PanelContent from '../components/Panel'
-import ContextMenu from '../components/ContextMenu'
-import CommandPalette from '../components/CommandPalette'
-import SettingsModal from '../components/Settings/SettingsModal'
-import ActivityPanel from '../components/Activity/ActivityPanel'
+import Sidebar from '../features/sidebar/Sidebar'
+import PanelContent from '../features/panels/PanelContent'
+import ContextMenu from '../features/workspace/ContextMenu'
+import CommandPalette from '../features/search/CommandPalette'
+import SettingsModal from '../features/settings/SettingsModal'
+import ActivityPanel from '../features/workspace/ActivityPanel'
+import SelectionBar from '../features/files/SelectionBar'
+import MoveToModal from '../features/folders/MoveToModal'
+import NewFolderModal from '../features/folders/NewFolderModal'
 
 export default function Workspace() {
   const {
@@ -109,9 +112,9 @@ export default function Workspace() {
             </svg>
           </button>
 
-          {/* New item */}
+          {/* New item — opens sidebar which has the full New dropdown */}
           <button
-            onClick={() => {}}
+            onClick={() => setSidebarOpen(true)}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-background-main/90 border border-divider shadow-sm hover:bg-background-main text-text-dark-secondary transition-colors"
             title="New item"
           >
@@ -168,6 +171,9 @@ export default function Workspace() {
       <CommandPalette />
       <SettingsModal />
       <ActivityPanel />
+      <SelectionBar />
+      <MoveToModal />
+      <NewFolderModal />
     </div>
   )
 }

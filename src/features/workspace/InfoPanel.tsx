@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useStore } from '../store/workspace'
+import { useStore } from '../../store/workspace'
 import { format } from 'date-fns'
 
 const TYPE_LABEL: Record<string, string> = {

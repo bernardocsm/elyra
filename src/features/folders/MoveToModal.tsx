@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { useStore } from '../store/workspace'
-import { supabase } from '../lib/supabase'
+import { useStore } from '../../store/workspace'
+import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
-import type { Item } from '../types'
+import type { Item } from '../../types'
 
 interface FolderRowProps {
   item: Item | null // null = root

@@ -3,8 +3,8 @@ import type { User } from '@supabase/supabase-js'
 import type { Workspace, Item, Panel, ContextMenuState } from '../types'
 
 interface WorkspaceStore {
-  // Auth
-  user: User | null
+  // Auth — undefined = still initializing, null = not logged in, User = logged in
+  user: User | null | undefined
   setUser: (user: User | null) => void
 
   // Workspace
@@ -88,7 +88,7 @@ let panelCounter = 2
 
 export const useStore = create<WorkspaceStore>((set) => ({
   // Auth
-  user: null,
+  user: undefined,
   setUser: (user) => set({ user }),
 
   // Workspace
